@@ -151,19 +151,19 @@ namespace Unity.Services.Mediation.Build.Editor
         /// </summary>
         bool ValidateSpecs(SdkInfo sdkInfo, List<AdapterInfo> installedAdapters, IList<KeyValuePair<string, string>> specs)
         {
+            // Kazoo - these checks fails when overriding the SDK, disabling
+#region KAZOO_CHANGE
+#if _VALIDATE_SPECS
             var sdkSpec = specs
                 .Select(pair => pair.Key)
                 .Where(s => s.StartsWith(sdkInfo.AndroidArtifact))
                 .ToArray();
 
-#region KAZOO_CHANGE
-            // Kazoo - this checks fails when overriding the SDK, disabling
-            //Check if SDK missing (or included multiple times for some reason)
-            //if (sdkSpec.Length != 1)
-            //{
-                //return false;
-            //}
-#endregion
+            Check if SDK missing (or included multiple times for some reason)
+            if (sdkSpec.Length != 1)
+            {
+                return false;
+            }
 
             //Check if we have valid version
             if (sdkSpec.First() != $"{sdkInfo.AndroidArtifact}:{VersionInfo.OptimisticVersion(SemanticVersioningType.Maven,sdkInfo.SdkVersion)}")
@@ -192,6 +192,8 @@ namespace Unity.Services.Mediation.Build.Editor
                     return false;
                 }
             }
+#endif
+#endregion
 
             return true;
         }
